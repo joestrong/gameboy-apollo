@@ -1,0 +1,6 @@
+/.vscode
+/.idea
+/out/*.o
+/out/*.sym
+/out/*.gb
+/art
