@@ -30,9 +30,28 @@ CopyTilemap:
     ret
 
 UpdateMenu:
+    ; scrolling
     ld a, [rSCX]
     inc a
     ldh [rSCX], a
+
+    ; Check for A button input
+    ld hl, rP1 ; get address
+    ld a, P1F_4 ; get button mode
+    ld [hl], a ; write button mode
+
+    ld a, [hl] ; delay few cycles
+    ld a, [hl] ; delay few cycles
+    cpl ; invert
+    and $0F
+
+    bit 0, a ; check for A button
+    jp nz, StuckLoop
+    
+    ret
+
+StuckLoop:
+    jp StuckLoop
     ret
 
 SECTION "Tile data", ROM0
