@@ -24,5 +24,5 @@ MenuScreen:
 
 MenuLoop:
     call WaitVBlank
-    ; do logic
+    call UpdateMenu
     jp MenuLoop

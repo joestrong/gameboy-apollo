@@ -29,6 +29,12 @@ CopyTilemap:
 
     ret
 
+UpdateMenu:
+    ld a, [rSCX]
+    inc a
+    ldh [rSCX], a
+    ret
+
 SECTION "Tile data", ROM0
 
 Tiles:
