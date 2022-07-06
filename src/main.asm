@@ -1,6 +1,7 @@
 INCLUDE "inc/hardware.inc"
 INCLUDE "src/lcd.asm"
 INCLUDE "src/menu.asm"
+INCLUDE "src/game.asm"
 
 SECTION "Header", ROM0[$100]
 
@@ -26,3 +27,9 @@ MenuLoop:
     call WaitVBlank
     call UpdateMenu
     jp MenuLoop
+
+GameScreen:
+    call WaitVBlank
+    call LCDOff
+    call CreateGame
+    call LCDOn

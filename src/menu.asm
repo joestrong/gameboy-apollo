@@ -46,12 +46,8 @@ UpdateMenu:
     and $0F
 
     bit 0, a ; check for A button
-    jp nz, StuckLoop
+    jp nz, GameScreen
     
-    ret
-
-StuckLoop:
-    jp StuckLoop
     ret
 
 SECTION "Tile data", ROM0
