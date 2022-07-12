@@ -33,3 +33,5 @@ GameScreen:
     call LCDOff
     call CreateGame
     call LCDOn
+.Done
+    halt

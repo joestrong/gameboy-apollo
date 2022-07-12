@@ -1,4 +1,4 @@
-Section "Game", ROM0
+SECTION "Game", ROM0
 
 CreateGame:
     ; Load map
