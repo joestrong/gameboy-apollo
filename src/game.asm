@@ -1,6 +1,9 @@
 SECTION "Game", ROM0
 
 CreateGame:
+    ; Reset scroll
+    ld a, 0
+    ld [rSCX], a
     ; Load map
     ld hl, $9800
     ld de, GameTileMap
