@@ -5,14 +5,14 @@ CreateMenu:
     ld de, MenuTilemap
     ld hl, $9800
     ld bc, MenuTilemapEnd - MenuTilemap
-CopyTilemap:
+.CopyTilemap
     ld a, [de]
     ld [hli], a
     inc de
     dec bc
     ld a, b
     or a, c
-    jp nz, CopyTilemap
+    jp nz, .CopyTilemap
 
     ret
 

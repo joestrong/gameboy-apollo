@@ -4,18 +4,62 @@ CreateGame:
     ; Reset scroll
     ld a, 0
     ld [rSCX], a
+
+    call LoadTileMap
+    call LoadSprites
+    call PlaceSprites
+    ret
+
+LoadSprites:
+    ld a, $00
+    ld [$FE02], a
+    ld a, $01
+    ld [$FE06], a
+    ld a, $10
+    ld [$FE0A], a
+    ld a, $11
+    ld [$FE0E], a
+    ld a, $20
+    ld [$FE12], a
+    ld a, $21
+    ld [$FE16], a
+
+    ret
+
+PlaceSprites:
+    ld a, 120 ; Y
+    ld [$FE00], a
+    ld [$FE04], a
+    add 8
+    ld [$FE08], a
+    ld [$FE0C], a
+    add 8
+    ld [$FE10], a
+    ld [$FE14], a
+
+    ld a, 32 ; X
+    ld [$FE01], a
+    ld [$FE09], a
+    ld [$FE11], a
+    add 8
+    ld [$FE05], a
+    ld [$FE0D], a
+    ld [$FE15], a
+    ret
+
+LoadTileMap:
     ; Load map
     ld hl, $9800
     ld de, GameTileMap
     ld bc, GameTileMapEnd - GameTileMap
-CopyTileMap:
+.CopyTileMap
     ld a, [de]
     ld [hli], a
     inc de
     dec bc
     ld a, b
     or a, c
-    jr nz, CopyTileMap
+    jr nz, .CopyTileMap
 
     ret
 

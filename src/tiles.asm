@@ -2,7 +2,7 @@ SECTION "Tiles", ROM0
 
 LoadTiles:
     call LoadBGTiles
-    call LoadSprites
+    call LoadOBJTiles
     ret
 
 LoadBGTiles:
@@ -12,7 +12,7 @@ LoadBGTiles:
     call CopyTiles
     ret
 
-LoadSprites:
+LoadOBJTiles:
     ld de, Sprites
     ld hl, $8000
     ld bc, SpritesEnd - Sprites

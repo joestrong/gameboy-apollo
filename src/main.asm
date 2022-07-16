@@ -1,6 +1,7 @@
 INCLUDE "inc/hardware.inc"
 INCLUDE "src/lcd.asm"
 INCLUDE "src/tiles.asm"
+INCLUDE "src/sprites.asm"
 INCLUDE "src/menu.asm"
 INCLUDE "src/game.asm"
 
@@ -18,6 +19,7 @@ Init:
     call WaitVBlank
     call LCDOff
     call LoadTiles
+    call WipeSprites
 
 MenuScreen:
     call CreateMenu
@@ -27,15 +29,18 @@ MenuScreen:
 	ld a, %11100100
 	ld [rBGP], a
 
-MenuLoop:
+	ld a, %11000100
+	ld [rOBP0], a
+
+.MenuLoop
     call WaitVBlank
     call UpdateMenu
-    jp MenuLoop
+    jp .MenuLoop
 
 GameScreen:
     call WaitVBlank
     call LCDOff
     call CreateGame
     call LCDOn
-.Done
+.GameLoop
     halt
