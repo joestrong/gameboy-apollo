@@ -43,4 +43,6 @@ GameScreen:
     call CreateGame
     call LCDOn
 .GameLoop
-    halt
+    call WaitVBlank
+    call UpdateGame
+    jp .GameLoop

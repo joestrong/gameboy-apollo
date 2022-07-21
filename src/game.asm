@@ -1,3 +1,5 @@
+DEF playerX EQU $C000
+
 SECTION "Game", ROM0
 
 CreateGame:
@@ -7,10 +9,52 @@ CreateGame:
 
     call LoadTileMap
     call LoadSprites
+
+    ld a, 32
+    ld [playerX], a
+
     call PlaceSprites
     ret
 
+UpdateGame:
+    call PlaceSprites ; Update visuals with positions
+
+    ; Check for dpad input
+    ld hl, rP1
+    ld a, P1F_5 ; using dpad mode
+    ld [hl], a
+
+    ld a, [hl] ; delay few cycles
+    ld a, [hl] ; delay few cycles
+    cpl ; invert
+    and $0F 
+
+    bit 0, a
+    call nz, PlayerMoveRight
+
+    bit 1, a
+    call nz, PlayerMoveLeft
+
+    ret
+
+PlayerMoveRight:
+    push af
+    ld a, [playerX]
+    inc a
+    ld [playerX], a
+    pop af
+    ret
+
+PlayerMoveLeft:
+    push af
+    ld a, [playerX]
+    dec a
+    ld [playerX], a
+    pop af
+    ret
+
 LoadSprites:
+    ; Loads tiles for player sprites
     ld a, $00
     ld [$FE02], a
     ld a, $01
@@ -27,6 +71,7 @@ LoadSprites:
     ret
 
 PlaceSprites:
+    ; Positions player sprites X & Y
     ld a, 120 ; Y
     ld [$FE00], a
     ld [$FE04], a
@@ -37,7 +82,7 @@ PlaceSprites:
     ld [$FE10], a
     ld [$FE14], a
 
-    ld a, 32 ; X
+    ld a, [playerX] ; X
     ld [$FE01], a
     ld [$FE09], a
     ld [$FE11], a
