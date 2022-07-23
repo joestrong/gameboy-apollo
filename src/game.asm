@@ -85,8 +85,18 @@ PlayerMoveLeft:
 
 JumpPressed:
     push af
+    ; skip if not still
+    ld a, [playerYSpeed]
+    cp 0
+    jr nz, .skip
+    ; skip if not on ground
+    ld a, [playerY]
+    cp 120
+    jr nz, .skip
+
     ld a, -7
     ld [playerYSpeed], a
+.skip
     pop af
     ret
 
@@ -131,7 +141,6 @@ UpdateFalling:
 .fallLoop
     ; skip if collision
     ld a, c
-    inc a
     cp 120
     jr z, .afterLoop
 
