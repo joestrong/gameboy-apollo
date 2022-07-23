@@ -1,4 +1,7 @@
-DEF playerX EQU $C000
+DEF playerX      EQU $C000
+DEF playerY      EQU $C001
+DEF playerXSpeed EQU $C002
+DEF playerYSpeed EQU $C003
 
 SECTION "Game", ROM0
 
@@ -12,6 +15,9 @@ CreateGame:
 
     ld a, 32
     ld [playerX], a
+
+    ld a, 120
+    ld [playerY], a
 
     call PlaceSprites
     ret
@@ -35,6 +41,28 @@ UpdateGame:
     bit 1, a
     call nz, PlayerMoveLeft
 
+    ; Check for button input
+    ld hl, rP1
+    ld a, P1F_4 ; using button mode
+    ld [hl], a
+
+    ld a, [hl] ; delay few cycles
+    ld a, [hl] ; delay few cycles
+    ld a, [hl] ; delay few cycles
+    cpl ; invert
+    and $0F
+
+    bit 0, a
+    call nz, JumpPressed
+
+    ld a, [playerY]
+    cp 120
+    call c, AddGravity
+    cp 120
+    call nc, CancelGravity
+
+    call UpdatePositions
+
     ret
 
 PlayerMoveRight:
@@ -50,6 +78,52 @@ PlayerMoveLeft:
     ld a, [playerX]
     dec a
     ld [playerX], a
+    pop af
+    ret
+
+JumpPressed:
+    push af
+    ld a, -10
+    ld [playerYSpeed], a
+    pop af
+    ret
+
+AddGravity:
+    push af
+    ; check for max velocity
+    ld a, [playerYSpeed]
+    cp 10
+    jr z, .skip
+
+    inc a
+    ld [playerYSpeed], a
+.skip
+    pop af
+    ret
+
+CancelGravity:
+    push af
+    ; check that we're not jumping
+    ld a, [playerYSpeed]
+    cp 129
+    jr nc, .skip
+
+    ; cancel any falling
+    ld a, 0
+    ld [playerYSpeed], a
+.skip
+    pop af
+    ret
+
+UpdatePositions:
+    push af
+    push bc
+    ld a, [playerYSpeed]
+    ld b, a
+    ld a, [playerY]
+    add b
+    ld [playerY], a
+    pop bc
     pop af
     ret
 
@@ -72,7 +146,7 @@ LoadSprites:
 
 PlaceSprites:
     ; Positions player sprites X & Y
-    ld a, 120 ; Y
+    ld a, [playerY] ; Y
     ld [$FE00], a
     ld [$FE04], a
     add 8
