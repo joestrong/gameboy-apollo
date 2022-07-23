@@ -58,10 +58,12 @@ UpdateGame:
     ld a, [playerY]
     cp 120
     call c, AddGravity
-    cp 120
     call nc, CancelGravity
 
-    call UpdatePositions
+    ld a, [playerYSpeed]
+    cp 128
+    call c, UpdateFalling
+    call nc, UpdateJumping
 
     ret
 
@@ -83,7 +85,7 @@ PlayerMoveLeft:
 
 JumpPressed:
     push af
-    ld a, -10
+    ld a, -7
     ld [playerYSpeed], a
     pop af
     ret
@@ -115,7 +117,38 @@ CancelGravity:
     pop af
     ret
 
-UpdatePositions:
+UpdateFalling:
+    push af
+    push bc
+    ld a, [playerYSpeed]
+    ; skip if speed is 0
+    cp 0
+    jr z, .skip
+
+    ld b, a
+    ld a, [playerY]
+    ld c, a
+.fallLoop
+    ; skip if collision
+    ld a, c
+    inc a
+    cp 120
+    jr z, .afterLoop
+
+    inc c
+    dec b
+    ld a, b
+    cp 0
+    jr nz, .fallLoop
+.afterLoop
+    ld a, c
+    ld [playerY], a
+.skip
+    pop bc
+    pop af
+    ret
+
+UpdateJumping:
     push af
     push bc
     ld a, [playerYSpeed]
