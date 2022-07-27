@@ -29,7 +29,7 @@ MenuScreen:
 	ld a, %11100100
 	ld [rBGP], a
 
-	ld a, %11000100
+	ld a, %11010000
 	ld [rOBP0], a
 
 .MenuLoop
