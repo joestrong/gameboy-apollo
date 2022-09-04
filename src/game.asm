@@ -96,6 +96,7 @@ JumpPressed:
 
     ld a, -7
     ld [playerYSpeed], a
+    call JumpSound
 .skip
     pop af
     ret

@@ -4,6 +4,7 @@ INCLUDE "src/tiles.asm"
 INCLUDE "src/sprites.asm"
 INCLUDE "src/menu.asm"
 INCLUDE "src/game.asm"
+INCLUDE "src/audio.asm"
 
 SECTION "Header", ROM0[$100]
 
@@ -12,9 +13,7 @@ SECTION "Header", ROM0[$100]
 	ds $150 - @, 0 ; Make room for the header
 
 Init:
-	; Shut down audio circuitry
-	ld a, 0
-	ld [rNR52], a
+    call InitAudio
 
     call WaitVBlank
     call LCDOff
