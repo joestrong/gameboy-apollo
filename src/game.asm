@@ -7,8 +7,9 @@ SECTION "Game", ROM0
 
 CreateGame:
     ; Reset scroll
-    ld a, 0
+    xor a
     ld [rSCX], a
+    ld [playerYSpeed], a
 
     call LoadTileMap
     call LoadSprites
