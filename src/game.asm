@@ -27,23 +27,21 @@ UpdateGame:
 
     ; Check for dpad input
     ld hl, rP1
-    ld a, P1F_5 ; using dpad mode
+    ld a, P1F_4 ; using dpad mode
+    cpl
     ld [hl], a
 
     ld a, [hl] ; delay few cycles
     ld a, [hl] ; delay few cycles
     cpl ; invert
-    and $0F 
-
-    bit 0, a
-    call nz, PlayerMoveRight
-
-    bit 1, a
-    call nz, PlayerMoveLeft
+    and $0F
+    ld b, a
+    swap b
 
     ; Check for button input
     ld hl, rP1
-    ld a, P1F_4 ; using button mode
+    ld a, P1F_5 ; using button mode
+    cpl
     ld [hl], a
 
     ld a, [hl] ; delay few cycles
@@ -51,6 +49,13 @@ UpdateGame:
     ld a, [hl] ; delay few cycles
     cpl ; invert
     and $0F
+    or b
+
+    bit 4, a
+    call nz, PlayerMoveRight
+
+    bit 5, a
+    call nz, PlayerMoveLeft
 
     bit 0, a
     call nz, JumpPressed
