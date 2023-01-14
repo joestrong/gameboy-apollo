@@ -1,7 +1,8 @@
-DEF playerX      EQU $C000
-DEF playerY      EQU $C001
-DEF playerXSpeed EQU $C002
-DEF playerYSpeed EQU $C003
+DEF playerXH     EQU $C000
+DEF playerX      EQU $C001
+DEF playerY      EQU $C002
+DEF playerXSpeed EQU $C003
+DEF playerYSpeed EQU $C004
 
 SECTION "Game", ROM0
 
@@ -9,7 +10,9 @@ CreateGame:
     ; Reset scroll
     xor a
     ld [rSCX], a
+    ld [playerXSpeed], a
     ld [playerYSpeed], a
+    ld [playerXH], a
 
     call LoadTileMap
     call LoadSprites
@@ -25,6 +28,7 @@ CreateGame:
 
 UpdateGame:
     call PlaceSprites ; Update visuals with positions
+    call UpdateScroll
 
     ; Check for dpad input
     ld hl, rP1
@@ -75,17 +79,33 @@ UpdateGame:
 
 PlayerMoveRight:
     push af
+    push bc
+    ld a, [playerXH]
+    ld b, a
     ld a, [playerX]
-    inc a
+    ld c, a
+    inc bc
+    ld a, b
+    ld [playerXH], a
+    ld a, c
     ld [playerX], a
+    pop bc
     pop af
     ret
 
 PlayerMoveLeft:
     push af
+    push bc
+    ld a, [playerXH]
+    ld b, a
     ld a, [playerX]
-    dec a
+    ld c, a
+    dec bc
+    ld a, b
+    ld [playerXH], a
+    ld a, c
     ld [playerX], a
+    pop bc
     pop af
     ret
 
@@ -205,7 +225,18 @@ PlaceSprites:
     ld [$FE10], a
     ld [$FE14], a
 
+    ld a, [playerXH]
+    and a
     ld a, [playerX] ; X
+    jr nz, .PlayerXMid
+    cp 80
+    jr nc, .PlayerXMid
+.PlayerXFirst
+    jr .PlayerXDone
+.PlayerXMid
+    ld a, 80
+    jr .PlayerXDone
+.PlayerXDone
     ld [$FE01], a
     ld [$FE09], a
     ld [$FE11], a
@@ -213,6 +244,22 @@ PlaceSprites:
     ld [$FE05], a
     ld [$FE0D], a
     ld [$FE15], a
+    ret
+
+UpdateScroll:
+    ld a, [playerXH]
+    and a
+    ld a, [playerX]
+    jr nz, .UpdateScroll_PlayerXMid
+    cp 80
+    jr nc, .UpdateScroll_PlayerXMid
+.UpdateScroll_PlayerXFirst
+    xor a
+    ld [rSCX], a
+    ret
+.UpdateScroll_PlayerXMid
+    sub 80
+    ld [rSCX], a
     ret
 
 LoadTileMap:
