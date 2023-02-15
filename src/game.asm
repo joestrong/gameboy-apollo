@@ -1,4 +1,4 @@
-DEF playerXH     EQU $C000
+DEF screenX      EQU $C000
 DEF playerX      EQU $C001
 DEF playerY      EQU $C002
 DEF playerXSpeed EQU $C003
@@ -9,10 +9,10 @@ SECTION "Game", ROM0
 CreateGame:
     ; Reset scroll
     xor a
+    ld [screenX], a
     ld [rSCX], a
     ld [playerXSpeed], a
     ld [playerYSpeed], a
-    ld [playerXH], a
 
     call LoadTileMap
     call LoadSprites
@@ -28,7 +28,6 @@ CreateGame:
 
 UpdateGame:
     call PlaceSprites ; Update visuals with positions
-    call UpdateScroll
 
     ; Check for dpad input
     ld hl, rP1
@@ -80,15 +79,29 @@ UpdateGame:
 PlayerMoveRight:
     push af
     push bc
-    ld a, [playerXH]
-    ld b, a
+
     ld a, [playerX]
+    inc a
+    cp 90
+    jr z, .incScroll
+    jr .noScroll
+.incScroll
+    dec a
+    ld [playerX], a
+    ld a, [screenX]
+    ld b, a
+    ld a, [rSCX]
     ld c, a
     inc bc
     ld a, b
-    ld [playerXH], a
+    ld [screenX], a
     ld a, c
+    ld [rSCX], a
+    jr .end
+.noScroll
     ld [playerX], a
+.end
+
     pop bc
     pop af
     ret
@@ -96,15 +109,29 @@ PlayerMoveRight:
 PlayerMoveLeft:
     push af
     push bc
-    ld a, [playerXH]
-    ld b, a
+
     ld a, [playerX]
+    dec a
+    cp 70 
+    jr z, .incScroll
+    jr .noScroll
+.incScroll
+    inc a
+    ld [playerX], a
+    ld a, [screenX]
+    ld b, a
+    ld a, [rSCX]
     ld c, a
     dec bc
     ld a, b
-    ld [playerXH], a
+    ld [screenX], a
     ld a, c
+    ld [rSCX], a
+    jr .end
+.noScroll
     ld [playerX], a
+.end
+
     pop bc
     pop af
     ret
@@ -225,18 +252,7 @@ PlaceSprites:
     ld [$FE10], a
     ld [$FE14], a
 
-    ld a, [playerXH]
-    and a
-    ld a, [playerX] ; X
-    jr nz, .PlayerXMid
-    cp 80
-    jr nc, .PlayerXMid
-.PlayerXFirst
-    jr .PlayerXDone
-.PlayerXMid
-    ld a, 80
-    jr .PlayerXDone
-.PlayerXDone
+    ld a, [playerX]
     ld [$FE01], a
     ld [$FE09], a
     ld [$FE11], a
@@ -244,22 +260,6 @@ PlaceSprites:
     ld [$FE05], a
     ld [$FE0D], a
     ld [$FE15], a
-    ret
-
-UpdateScroll:
-    ld a, [playerXH]
-    and a
-    ld a, [playerX]
-    jr nz, .UpdateScroll_PlayerXMid
-    cp 80
-    jr nc, .UpdateScroll_PlayerXMid
-.UpdateScroll_PlayerXFirst
-    xor a
-    ld [rSCX], a
-    ret
-.UpdateScroll_PlayerXMid
-    sub 80
-    ld [rSCX], a
     ret
 
 LoadTileMap:
